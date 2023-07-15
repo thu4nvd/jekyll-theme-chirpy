@@ -1,0 +1,320 @@
+---
+layout: post
+title: "\U0001F991 Squid proxy - Cài đặt Cấu hình / CentOS 7"
+date: 2022-10-15 12:13:13.000000000 -07:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- System
+tags:
+- proxy
+- squid
+meta:
+  _oembed_a9848adf83e63a8ed864e6354b650086: "{{unknown}}"
+  _oembed_d62c9d0cd31905891b079e57bebe5aa3: "{{unknown}}"
+  _oembed_da3244839c74463f9bb5061e8b29e27e: "{{unknown}}"
+  _oembed_06f2855f7cc54fb5c2db06de3974aace: "{{unknown}}"
+  _thumbnail_id: '2097'
+  _edit_last: '1'
+  _aioseo_title: ''
+  _aioseo_description: ''
+  _aioseo_keywords: ''
+  _aioseo_og_title: ''
+  _aioseo_og_description: ''
+  _aioseo_og_article_section: ''
+  _aioseo_og_article_tags: ''
+  _aioseo_twitter_title: ''
+  _aioseo_twitter_description: ''
+  covernews-meta-content-alignment: align-content-left
+  _wp_old_slug: "%f0%9f%a6%91-squid-proxy-cai-dat-va-cau-hinh-tren-centos-7"
+author:
+  login: thuanvd@outlook.com
+  email: thu4nvd@gmail.com
+  display_name: Thuận Vũ
+  first_name: Thuận
+  last_name: Vũ
+permalink: "/squid-install/"
+---
+<p><!-- wp:kadence/tableofcontents {"uniqueID":"_8a9090-f9","containerBackground":"#abb8c3","enableTitle":false} /--></p>
+<p><!-- wp:paragraph --></p>
+<p>Squid với đầy đủ tính năng của một caching proxy hỗ trợ các giao thức mạng phổ biến như HTTP, HTTPS, FTP ...Sử dụng Squid bạn có thể cải thiện đáng kể hiệu năng khi truy cập các website bằng cách lưu trữ các yêu cầu lặp lại, lọc lưu lượng truy cập web và truy cập nội dung bị giới hạn theo địa lý.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 id="c-i-t-squid-tr-n-centos">Cài đặt Squid trên CentOS</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Squid package đã có sẵn trên CentOS repositories, chạy lệnh sau để thực hiện cài đặt:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo yum update -y
+sudo yum -y install epel-release
+sudo yum update -y
+sudo yum install squid</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sau khi cài đặt hoàn tất, start và enable Squid service:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo systemctl start squid
+$sudo systemctl enable squid</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Để xác minh việc cài đặt thành công, hãy nhập lệnh sau sẽ in trạng thái dịch vụ:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo systemctl status squid</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>squid.service - Squid caching proxy
+   Loaded: loaded (/usr/lib/systemd/system/squid.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sat 2020-04-18 8:47:56 UTC; 12s ago
+...</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":2122,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{ site.baseurl }}/assets/2022/10/squid-server-status-1536x624.png-1024x416.webp" alt="" class="wp-image-2122" /></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 id="c-u-h-nh-squid">Cấu hình Squid</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Squid có thể được cấu hình bằng cách chỉnh sửa file <code>/etc/squid/squid.conf</code>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Trước khi thực hiện bất kỳ thay đổi nào, hãy sao lưu tệp cấu hình gốc bằng lệnh cp:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo cp /etc/squid/squid.conf{,.orginal}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Để chỉnh sửa tệp, hãy mở nó trong trình soạn thảo của bạn:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo nano /etc/squid/squid.conf</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Theo mặc định, Squid được cấu hình để lắng nghe trên cổng 3128 trên tất cả các network interfaces của máy chủ.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Nếu bạn muốn thay đổi port và network interface, xoá dấu # trước <code>http_port</code> và thiết lập IP và port mới.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># Squid normally listens to port 3128
+http_port IP_ADDR:PORT</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>/etc/squid/squid.conf</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Bạn có thể kiểm soát quyền truy cập vào máy chủ Squid bằng việc sử dụng Access Control Lists (ACLs).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Theo mặc định, Squid chỉ cho phép truy cập từ localhost và localnet.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Nếu tất cả các máy client sử dụng proxy có địa chỉ IP tĩnh, bạn có thể tạo ra một ACL chứa các IP được phép truy cập.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thay vì thêm các địa chỉ IP trong tệp cấu hình chính, chúng ta sẽ tạo một file riêng biêt chứa các IP:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>192.168.33.1
+192.168.33.2
+# All other allowed IPs</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>/etc/squid/allowed_ips.txt</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sau khi hoàn tất, hãy mở tệp cấu hình chính và tạo một ACL mới có tên <code>allow_ips</code> và cho phép truy cập vào ACL đó bằng <code>http_access</code>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># ...
+acl allowed_ips  src "/etc/squid/allowed_ips.txt"
+# ...
+http_access allow localnet
+http_access allow localhost
+http_access allow allowed_ips
+# And finally deny all other access to this proxy
+http_access deny all</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>/etc/squid/squid.conf</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thứ tự của các quy tắc <code>http_access</code> rất quan trọng. Hãy đảm bảo bạn thêm quy tắc phía trên dòng <code>http_access deny all</code>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Các quy tắc http_access hoạt động theo cách tương tự như các quy tắc tường lửa. Squid sẽ đọc các quy tắc từ trên xuống dưới.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Bất cứ khi nào bạn thay đổi tệp cấu hình, bạn cần khởi động lại dịch vụ Squid để các thay đổi có hiệu lực:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo systemctl restart squid</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3>Kiểm tra kết nối đến proxy Server</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sử dụng câu lệnh sau để kiểm tra xem proxy server có hoạt động không và kiểm tra kết nối đến proxy server đó</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>curl -x http://&lt;squid-proxy-server-IP&gt;:3128  -L http://google.com</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":2123,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{ site.baseurl }}/assets/2022/10/squid-server-connectivity-test.png.webp" alt="" class="wp-image-2123" /></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 id="x-c-th-c-squid">Xác thực Squid</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Squid có thể sử dụng nhiều loại backend để xác thực người dùng như <strong>Samba, LDAP and HTTP basic auth</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Trong bài này, chúng ta sẽ cấu hình Squid để sử dụng basic auth. Nó là một phương thức xác thực đơn giản được tích hợp trong giao thức HTTP.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Chúng ta sẽ sử dụng openssl để tạo <code>username:password</code> và ghép nối với file <code>/etc/squid/htpasswd</code> với lệnh <code>tee</code> như bên dưới:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>printf "USERNAME:$(openssl passwd -crypt PASSWORD)\n" | sudo tee -a /etc/squid/htpasswd
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Ví dụ: để tạo một người dùng có tên là <code>huudoanh</code>, &nbsp;mật khẩu là <code>Pz@$154</code>, bạn sẽ chạy:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$printf "huudoanh:$(openssl passwd -crypt 'Pz@$154')\n" | sudo tee -a /etc/squid/htpasswd
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>huudoanh:2nkgQsTSPCsIo</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Output</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Bước tiếp theo là cấu hình Squid để kích hoạt HTTP basic authentication. Mở file cấu hình chính và thêm vào như sau:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># ...
+<strong>auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/htpasswd
+auth_param basic realm proxy
+acl authenticated proxy_auth REQUIRED</strong>
+# ...
+http_access allow localnet
+http_access allow localhost
+http_access allow authenticated
+# And finally deny all other access to this proxy
+http_access deny all</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>/etc/squid/squid.conf</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Khởi động lại Squid service</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo systemctl restart squid
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 id="c-u-h-nh-firewall">Cấu hình firewall</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Nếu bạn đang chạy tường lửa, bạn sẽ cần mở cổng 3128. Để thực hiện, hãy chạy các lệnh sau:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo firewall-cmd --permanent --add-port=3128/tcp
+$firewall-cmd --reload</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3>Cấu hình chặn websites</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Another great use of the proxy server is restricting the website access. <br />Follow the steps below for creating a block list.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Step 1: Open a blocked list file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">sudo vi /etc/squid/blocked_sites</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add the websites to be blocked in the file. For example,</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">facebook.com
+twitter.com
+instagram.com</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p>Step 2: Open the squid config file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">sudo vi /etc/squid/squid.conf</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add the following to the ACL list.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">acl blocked_sites dstdomain "/etc/squid/blocked_sites"
+http_access deny blocked_sites</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p>Step 3: Restart the squid server.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">sudo systemctl restart squid</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now if you try to access the blocked site through the proxy, you will get a forbidden message as shown below.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":2129,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{ site.baseurl }}/assets/2022/10/squid-proxy-blocked-sites-1536x196.png-1024x131.webp" alt="" class="wp-image-2129" /></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 id="c-u-h-nh-tr-nh-duy-t-s-d-ng-proxy">Cấu hình trình duyệt sử dụng proxy</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 id="firefox">Firefox</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Các bước thiết lập dưới đây dành cho cả Windows, macOS, và Linux.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<li>Ở góc trên bên phải, nhấp vào biểu tượng <code>☰</code> để mở Firefox menu:</li>
+<li>Click vào link <code>⚙ Preferences</code>.</li>
+<li>Cuộn xuống <code>Network Settings</code> click vào nút <code>Settings...</code>.</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Một cửa sổ mới mở ra.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Chọn <code>Manual proxy configuration</code>.</li>
+<li>Nhập địa chỉ IP address của Squid server vào trường <code>HTTP Host</code> &nbsp;và <code>3128</code> ở trường <code>Port</code>.</li>
+<li>Chọn <code>Also use this proxy for FPT and HTTPS</code>.</li>
+<li>Click vào nút <code>OK</code> để lưu lại các thiết lập.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image --></p>
+<figure class="wp-block-image"><img src="{{ site.baseurl }}/assets/2022/10/Squid-Firefox.png" alt="" /></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3>Tham khảo</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Documentation : <a href="http://www.squid-cache.org/Doc/config/" target="_blank" rel="noopener">Squid configuration</a> </li>
+<li>Wiki beginner: <a href="https://wiki.squid-cache.org/ConfigExamples" target="_blank" rel="noopener">Squid wiki</a></li>
+<li>English version: <a href="https://devopscube.com/setup-and-configure-proxy-server/" target="_blank" rel="noopener">https://devopscube.com/setup-and-configure-proxy-server/ </a></li>
+<li>Credit: huudoanh.com</li>
+</ul>
+<p><!-- /wp:list --></p>
